@@ -19,9 +19,7 @@ class PermissionRequestTransparentActivity: Activity() {
                 val mediaProjectionManager =
                     getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
                 val intent = mediaProjectionManager.createScreenCaptureIntent()
-                //startActivityForResult(intent, REQ_REQUEST_MEDIA_PROJECTION)
-                launchService(intent)
-                finish()
+                startActivityForResult(intent, REQ_REQUEST_MEDIA_PROJECTION)
             }
             else -> finish()
         }
