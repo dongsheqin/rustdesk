@@ -56,16 +56,41 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun requestMediaProjection() {
-        val intent = Intent(this, PermissionRequestTransparentActivity::class.java).apply {
-            action = ACT_REQUEST_MEDIA_PROJECTION
-        }
-        startActivityForResult(intent, REQ_INVOKE_PERMISSION_ACTIVITY_MEDIA_PROJECTION)
+        //val intent = Intent(this, PermissionRequestTransparentActivity::class.java).apply {
+        //    action = ACT_REQUEST_MEDIA_PROJECTION
+        //}
+        //startActivityForResult(intent, REQ_INVOKE_PERMISSION_ACTIVITY_MEDIA_PROJECTION)
+        
+        val mediaProjectionManager =
+              getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        val intent = mediaProjectionManager.createScreenCaptureIntent()
+        startActivityForResult(intent, REQ_REQUEST_MEDIA_PROJECTION)
     }
 
+    private fun launchService(mediaProjectionResultIntent: Intent) {
+        Log.d(logTag, "Launch MainService")
+        val serviceIntent = Intent(this, MainService::class.java)
+        serviceIntent.action = ACT_INIT_MEDIA_PROJECTION_AND_SERVICE
+        serviceIntent.putExtra(EXT_MEDIA_PROJECTION_RES_INTENT, mediaProjectionResultIntent)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
+    }
+    
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQ_INVOKE_PERMISSION_ACTIVITY_MEDIA_PROJECTION && resultCode == RES_FAILED) {
-            flutterMethodChannel?.invokeMethod("on_media_projection_canceled", null)
+        //if (requestCode == REQ_INVOKE_PERMISSION_ACTIVITY_MEDIA_PROJECTION && resultCode == RES_FAILED) {
+        //    flutterMethodChannel?.invokeMethod("on_media_projection_canceled", null)
+        //}
+        if (requestCode == REQ_REQUEST_MEDIA_PROJECTION) {
+            if (resultCode == RESULT_OK && data != null) {
+                launchService(data)
+            } else {
+                setResult(RES_FAILED)
+            }
         }
     }
 

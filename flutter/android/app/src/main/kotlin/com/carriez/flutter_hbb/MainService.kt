@@ -44,7 +44,7 @@ import java.nio.ByteBuffer
 import kotlin.math.max
 import kotlin.math.min
 
-const val DEFAULT_NOTIFY_TITLE = "RustDesk"
+const val DEFAULT_NOTIFY_TITLE = "MiDesk"
 const val DEFAULT_NOTIFY_TEXT = "Service is running"
 const val DEFAULT_NOTIFY_ID = 1
 const val NOTIFY_ID_OFFSET = 100
@@ -331,10 +331,17 @@ class MainService : Service() {
     }
 
     private fun requestMediaProjection() {
-        val intent = Intent(this, PermissionRequestTransparentActivity::class.java).apply {
-            action = ACT_REQUEST_MEDIA_PROJECTION
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
+        //val intent = Intent(this, PermissionRequestTransparentActivity::class.java).apply {
+        //    action = ACT_REQUEST_MEDIA_PROJECTION
+        //    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        //}
+        //startActivity(intent)
+        
+        val mediaProjectionManager =
+              getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        val intent = mediaProjectionManager.createScreenCaptureIntent()
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        //startActivityForResult(intent, REQ_REQUEST_MEDIA_PROJECTION)
         startActivity(intent)
     }
 
